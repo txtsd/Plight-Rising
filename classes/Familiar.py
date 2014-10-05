@@ -45,7 +45,7 @@ class Familiar:
                                         referer='/main.php?p=hoard'
                                         )
                     self.check = True
-                except (ConnectionError, requests.exceptions.ReadTimeout):
+                except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
                     print('Prebond_1_error_pageload')
                     self.tried += 1
                     pass
@@ -74,7 +74,7 @@ class Familiar:
                                                      referer='/main.php?p=lair&id=' + self.userid + '&page=' + str(i - 1)
                                                      )
                                 self.check = True
-                            except (ConnectionError, requests.exceptions.ReadTimeout):
+                            except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
                                 print('Prebond_2_error_dergcollect')
                                 self.tried += 1
                                 pass
@@ -129,7 +129,7 @@ class Familiar:
                             #     print(result.group(1).encode())
                         else:
                             self.check = True
-                    except (ConnectionError, requests.exceptions.ReadTimeout):
+                    except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
                         print('Prebond_3_error_post')
                         self.tried += 1
                         pass
@@ -156,7 +156,7 @@ class Familiar:
                                         self.userid + '&tab=dragon&did=' + self.derg
                                         )
                     self.check = True
-                except (ConnectionError, requests.exceptions.ReadTimeout):
+                except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
                     print('Shuffle_1_error_pageload')
                     self.tried += 1
                     pass
@@ -213,7 +213,7 @@ class Familiar:
                                              )
                         time.sleep(random.uniform(self.mindelay, self.maxdelay))
                         self.check = True
-                    except (ConnectionError, requests.exceptions.ReadTimeout):
+                    except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
                         print('Shuffle_2_error_famswitch')
                         self.tried += 1
                         pass
@@ -263,7 +263,7 @@ class Familiar:
                             time.sleep(random.uniform(self.mindelay, self.maxdelay))
                         else:
                             self.check = True
-                    except (ConnectionError, requests.exceptions.ReadTimeout):
+                    except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
                         print('Shuffle_3_error_post')
                         self.tried += 1
                         pass
@@ -287,7 +287,7 @@ class Familiar:
                                              )
                         self.check = True
                         time.sleep(random.uniform(self.mindelay, self.maxdelay))
-                    except (ConnectionError, requests.exceptions.ReadTimeout):
+                    except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
                         print('Shuffle_4_error_autopageload')
                         self.tried += 1
                         pass
