@@ -62,6 +62,7 @@ class Familiar:
                     time.sleep(random.uniform(1, 3))
 
                     self.check = False
+                    self.tried = 0
                     while not self.check:
                         if (self.tried < 3):
                             try:
@@ -90,6 +91,7 @@ class Familiar:
             time.sleep(random.uniform(self.mindelay, self.maxdelay))
 
             self.check = False
+            self.tried = 0
             while not self.check:
                 if (self.tried < 3):
                     print(x)
@@ -142,6 +144,7 @@ class Familiar:
     def shuffle(self):
 
         self.check = False
+        self.tried = 0
         while not self.check:
             if (self.tried < 3):
                 try:
@@ -169,6 +172,7 @@ class Familiar:
         for x in familiars:
 
             self.check = False
+            self.tried = 0
             while not self.check:
                 if (self.tried < 3):
                     try:
@@ -222,6 +226,7 @@ class Familiar:
                     sys.exit()
 
             self.check = False
+            self.tried = 0
             while not self.check:
                 if (self.tried < 3):
                     print(x)
@@ -272,6 +277,7 @@ class Familiar:
                     sys.exit()
 
             self.check = False
+            self.tried = 0
             while not self.check:
                 if (self.tried < 3):
                     try:
