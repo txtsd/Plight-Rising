@@ -54,6 +54,8 @@ if config['account']['username'] or (not config['account']['username'] == 'herp'
                     print(type(e))
                     print(e.args)
                     print(e)
+                except KeyboardInterrupt:
+                    sys.exit()
                 # finally:
                 #     # del cHandler
                 #     time.sleep(random.randint(1, 2))
