@@ -46,11 +46,11 @@ class Familiar:
                                         )
                     self.check = True
                 except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
-                    print('Prebond_1_error_pageload')
+                    print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Prebond_1_error_pageload')
                     self.tried += 1
                     pass
             else:
-                print('Bad network. Try again later.')
+                print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Bad network. Try again later.')
                 sys.exit()
 
         dragons = re.findall('did=(\d*)', html.text)
@@ -76,11 +76,11 @@ class Familiar:
                                                      )
                                 self.check = True
                             except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
-                                print('Prebond_2_error_dergcollect')
+                                print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Prebond_2_error_dergcollect')
                                 self.tried += 1
                                 pass
                         else:
-                            print('Bad network. Try again later.')
+                            print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Bad network. Try again later.')
                             sys.exit()
 
                     dragons += re.findall('did=(\d*)', htmld.text)
@@ -132,11 +132,11 @@ class Familiar:
                         else:
                             self.check = True
                     except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
-                        print('Prebond_3_error_post')
+                        print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Prebond_3_error_post')
                         self.tried += 1
                         pass
                 else:
-                    print('Bad network. Try again later.')
+                    print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Bad network. Try again later.')
                     sys.exit()
 
         print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + "Prebonding Complete!")
@@ -160,11 +160,11 @@ class Familiar:
                                         )
                     self.check = True
                 except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
-                    print('Shuffle_1_error_pageload')
+                    print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Shuffle_1_error_pageload')
                     self.tried += 1
                     pass
             else:
-                print('Bad network. Try again later.')
+                print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Bad network. Try again later.')
                 sys.exit()
 
         # List the familiars that need bonding
@@ -218,11 +218,11 @@ class Familiar:
                         time.sleep(random.uniform(self.mindelay, self.maxdelay))
                         self.check = True
                     except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
-                        print('Shuffle_2_error_famswitch')
+                        print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Shuffle_2_error_famswitch')
                         self.tried += 1
                         pass
                 else:
-                    print('Bad network. Try again later.')
+                    print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Bad network. Try again later.')
                     sys.exit()
 
             self.check = False
@@ -269,11 +269,11 @@ class Familiar:
                         else:
                             self.check = True
                     except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
-                        print('Shuffle_3_error_post')
+                        print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Shuffle_3_error_post')
                         self.tried += 1
                         pass
                 else:
-                    print('Bad network. Try again later.')
+                    print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Bad network. Try again later.')
                     sys.exit()
 
             self.check = False
@@ -294,11 +294,11 @@ class Familiar:
                         self.check = True
                         time.sleep(random.uniform(self.mindelay, self.maxdelay))
                     except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
-                        print('Shuffle_4_error_autopageload')
+                        print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Shuffle_4_error_autopageload')
                         self.tried += 1
                         pass
                 else:
-                    print('Bad network. Try again later.')
+                    print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Bad network. Try again later.')
                     sys.exit()
 
         print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + "Done Bonding!")
