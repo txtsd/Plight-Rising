@@ -94,7 +94,7 @@ class Familiar:
             self.tried = 0
             while not self.check:
                 if (self.tried < 3):
-                    print(x)
+                    # print(x)
                     try:
                         html2 = self.acc.get('/main.php',
                                              param={
@@ -229,7 +229,7 @@ class Familiar:
             self.tried = 0
             while not self.check:
                 if (self.tried < 3):
-                    print(x)
+                    # print(x)
                     try:
                         html6 = self.acc.get('/main.php',
                                              param={
