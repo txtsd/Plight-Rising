@@ -184,25 +184,32 @@ class Coliseum(WebSocketClientProtocol):
                     self.warning = 0
                     dergcount = 0
                     for i, d in enumerate(self.fb['args'][0]['playerSet']):
-                        dergcount += 1
-                        teamHP += float(d['health'])
-                        teamMaxHP += float(d['maxHP'])
-                        if (teamHP < (teamMaxHP * 0.25)):
-                            print("[--Warning--] Team HP lower than 25%. Aborting.")
+                        try:
+                            dergcount += 1
+                            teamHP += float(d['health'])
+                            teamMaxHP += float(d['maxHP'])
+                            if (teamHP < (teamMaxHP * 0.25)):
+                                print("[--Warning--] Team HP lower than 25%. Aborting.")
+                                self.loop.close()
+                                self.loop.stop()
+                            if (d['a5'] == 674):
+                                self.fb['args'][0]['playerSet'][i]['strength'] += 5
+                                self.fb['args'][0]['playerSet'][i]['quickness'] += 3
+                                self.fb['args'][0]['playerSet'][i]['agility'] += 1
+                            if (d['a6'] == 674):
+                                self.fb['args'][0]['playerSet'][i]['strength'] += 5
+                                self.fb['args'][0]['playerSet'][i]['quickness'] += 3
+                                self.fb['args'][0]['playerSet'][i]['agility'] += 1
+                            if (d['a7'] == 674):
+                                self.fb['args'][0]['playerSet'][i]['strength'] += 5
+                                self.fb['args'][0]['playerSet'][i]['quickness'] += 3
+                                self.fb['args'][0]['playerSet'][i]['agility'] += 1
+                        except:
+                            print("[--Warning--] Less than 3 dergs in party. Rectify.")
                             self.loop.close()
                             self.loop.stop()
-                        if (d['a5'] == 674):
-                            self.fb['args'][0]['playerSet'][i]['strength'] += 5
-                            self.fb['args'][0]['playerSet'][i]['quickness'] += 3
-                            self.fb['args'][0]['playerSet'][i]['agility'] += 1
-                        if (d['a6'] == 674):
-                            self.fb['args'][0]['playerSet'][i]['strength'] += 5
-                            self.fb['args'][0]['playerSet'][i]['quickness'] += 3
-                            self.fb['args'][0]['playerSet'][i]['agility'] += 1
-                        if (d['a7'] == 674):
-                            self.fb['args'][0]['playerSet'][i]['strength'] += 5
-                            self.fb['args'][0]['playerSet'][i]['quickness'] += 3
-                            self.fb['args'][0]['playerSet'][i]['agility'] += 1
+                            os.system("pause")
+                    # This bit probably doesn't work since it the 3rd dragon entry exists anyway.
                     if (dergcount < 3):
                         print("[--Warning--] Less than 3 dergs in party. Rectify.")
                         os.system("pause")
