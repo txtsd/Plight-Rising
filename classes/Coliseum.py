@@ -213,9 +213,8 @@ class Coliseum(WebSocketClientProtocol):
                     if (dergcount < 3):
                         print("[--Warning--] Less than 3 dergs in party. Rectify.")
                         os.system("pause")
-                        self.loop.close()
-                        os.system("pause")
                         self.loop.stop()
+                        self.loop.close()
                         os.system("pause")
                     self.bId = msg['args'][0]['battleId']
                     go = {"name": "coliseum_battleLoaded",
