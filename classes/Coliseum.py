@@ -158,8 +158,8 @@ class Coliseum(WebSocketClientProtocol):
             # except:
             #     pass
             finally:
-                self.loop.close()
                 self.loop.stop()
+                # self.loop.close()
                 return
         elif not (html2.status_code == requests.codes.ok):
             # print('Not 200.')
@@ -218,8 +218,8 @@ class Coliseum(WebSocketClientProtocol):
                             teamMaxHP += float(d['maxHP'])
                             if (teamHP < (teamMaxHP * 0.25)):
                                 print("[--Warning--] Team HP lower than 25%. Aborting.")
-                                self.loop.close()
                                 self.loop.stop()
+                                # self.loop.close()
                             if (d['a5'] == 674):
                                 self.fb['args'][0]['playerSet'][i]['strength'] += 5
                                 self.fb['args'][0]['playerSet'][i]['quickness'] += 3
@@ -234,15 +234,14 @@ class Coliseum(WebSocketClientProtocol):
                                 self.fb['args'][0]['playerSet'][i]['agility'] += 1
                         except:
                             print("[--Warning--] Less than 3 dergs in party. Rectify.")
-                            self.loop.close()
                             self.loop.stop()
+                            # self.loop.close()
                             os.system("pause")
                     # This bit probably doesn't work since it the 3rd dragon entry exists anyway.
                     if (dergcount < 3):
                         print("[--Warning--] Less than 3 dergs in party. Rectify.")
-                        os.system("pause")
                         self.loop.stop()
-                        self.loop.close()
+                        # self.loop.close()
                         os.system("pause")
                     self.bId = msg['args'][0]['battleId']
                     go = {"name": "coliseum_battleLoaded",
@@ -308,8 +307,9 @@ class Coliseum(WebSocketClientProtocol):
                             if self.enemyList:
                                 # for d in self.fa['args'][0]['newTurns']['array']:
                                 #     if ((float(d['health']) < float((d['maxHP'])*0.25)) and d['team'] == 1):
-                                #         self.loop.close()
                                 #         self.loop.stop()
+                                #         self.loop.close()
+                                #         sys.exit()
                                 for i, x in enumerate(self.fb['args'][0]['enemySet']):
                                     if x['id'] == self.fa['args'][0]['target']:
                                         self.fb['args'][0]['enemySet'][i]['health'] -= self.fa['args'][0]['damage']
@@ -362,8 +362,8 @@ class Coliseum(WebSocketClientProtocol):
                                     if (self.warning >= 2):
                                         print("[--Warning--] Second derg died. Aborting.")
                                         self.warning = 0
-                                        self.loop.close()
                                         self.loop.stop()
+                                        # self.loop.close()
                 elif (msg['name'] == 'winBattle'):
 
                     ### Add data to file ###
@@ -412,8 +412,9 @@ class Coliseum(WebSocketClientProtocol):
 
     def onClose(self, wasClean, code, reason):
         print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + "WebSocket connection closed: {0}".format(reason))
-        # self.loop.close()
+        # sys.exit()
         self.loop.stop()
+        # self.loop.close()
         sys.exit()
 
     def getScratch(self, attacker, defender):
