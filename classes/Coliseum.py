@@ -78,24 +78,52 @@ class Coliseum(WebSocketClientProtocol):
         self.loop = asyncio.get_event_loop()
         Coliseum.userid = acc.getID()
         time.sleep(random.uniform(1, 2))
-        html = self.acc.get('/main.php',
-                            param={
-                                'p': 'coliseum',
-                            },
-                            referer='/main.php?p=coliseum')
+        self.check = False
+        self.tried = 0
+        while not self.check:
+            if (self.tried < 3):
+                try:
+                    html = self.acc.get('/main.php',
+                                        param={
+                                            'p': 'coliseum',
+                                        },
+                                        referer='/main.php?p=coliseum')
+                    self.check = True
+                except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
+                    print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Coli_1_error')
+                    self.tried += 1
+                    time.sleep(random.uniform(1, 2))
+                    pass
+            else:
+                print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Bad network. Try again later.')
+                sys.exit()
         time.sleep(random.uniform(1, 2))
         # print('lenhtml:', len(html.text))
         # print('test')
-        html2 = self.acc.get('http://207.58.158.212:4231/coliseum0/socket.io/1/',
-                             param={
-                                 't': str(int(time.time() * 1000)),
-                             },
-                             head={
-                                 'Accept': '*/*',
-                                 'Origin': 'http://flightrising.com',
-                             },
-                             referer='/main.php?p=coliseum'
-                             )
+        self.check = False
+        self.tried = 0
+        while not self.check:
+            if (self.tried < 3):
+                try:
+                    html2 = self.acc.get('http://207.58.158.212:4231/coliseum0/socket.io/1/',
+                                         param={
+                                             't': str(int(time.time() * 1000)),
+                                         },
+                                         head={
+                                             'Accept': '*/*',
+                                             'Origin': 'http://flightrising.com',
+                                         },
+                                         referer='/main.php?p=coliseum'
+                                         )
+                    self.check = True
+                except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
+                    print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Coli_2_error')
+                    self.tried += 1
+                    time.sleep(random.uniform(1, 2))
+                    pass
+            else:
+                print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Bad network. Try again later.')
+                sys.exit()
         # print('lenhtml2:', len(html2.text))
         # print('test2')
         if (html2.status_code == requests.codes.ok):
