@@ -130,6 +130,7 @@ class Familiar:
                             # if 'Death' in result.group(1):
                             #     print(result.group(1).encode())
                         else:
+                            print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Already Bonded ' + x + "'s familiar!")
                             self.check = True
                     except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
                         print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Prebond_3_error_post')
@@ -168,7 +169,7 @@ class Familiar:
                 sys.exit()
 
         # List the familiars that need bonding
-        familiars = re.findall("\"equip\(\'(\d*)'", html.text)
+        familiars = re.findall("\"attachFamiliar\(\'(\d+)'", html.text)
         for x in familiars:
 
             self.check = False
@@ -176,11 +177,10 @@ class Familiar:
             while not self.check:
                 if (self.tried < 3):
                     try:
-                        html2 = self.acc.get('/includes/familiar_inv.php',
+                        html2 = self.acc.get('/includes/familiar_active.php',
                                              param={
                                                  'id': self.derg,
                                                  'itm': x,
-                                                 'act': '1',
                                              },
                                              head={
                                                  'Accept': '*/*',
@@ -189,25 +189,7 @@ class Familiar:
                                              referer='/main.php?p=lair&id=' +
                                              self.userid + '&tab=familiar&did=' + self.derg
                                              )
-                        html4 = self.acc.get('/includes/familiar_active.php',
-                                             param={
-                                                 'id': self.derg,
-                                                 'itm': x,
-                                                 'act': '1',
-                                             },
-                                             head={
-                                                 'Accept': '*/*',
-                                                 'X-Requested-With': 'XMLHttpRequest',
-                                             },
-                                             referer='/main.php?p=lair&id=' +
-                                             self.userid + '&tab=familiar&did=' + self.derg
-                                             )
-                        html5 = self.acc.get('/includes/familiar_inv.php',
-                                             param={
-                                                 'id': self.derg,
-                                                 'itm': x,
-                                                 'act': '0',
-                                             },
+                        html3 = self.acc.get('/includes/familiar_inv.php',
                                              head={
                                                  'Accept': '*/*',
                                                  'X-Requested-With': 'XMLHttpRequest',
@@ -231,7 +213,7 @@ class Familiar:
                 if (self.tried < 3):
                     # print(x)
                     try:
-                        html6 = self.acc.get('/main.php',
+                        html4 = self.acc.get('/main.php',
                                              param={
                                                  'p': 'lair',
                                                  'id': self.userid,
@@ -241,10 +223,10 @@ class Familiar:
                                              referer='/main.php?p=lair&id=' +
                                              self.userid + '&tab=familiar&did=' + self.derg
                                              )
-                        famID = re.search("bondJamesbond\(\'(\d*)", html6.text)
+                        famID = re.search("bondJamesbond\(\'(\d*)", html4.text)
                         if famID:
                             time.sleep(random.uniform(self.mindelay, self.maxdelay))
-                            html7 = self.acc.post('/includes/ol/fam_bonding.php',
+                            html5 = self.acc.post('/includes/ol/fam_bonding.php',
                                                   data={
                                                       'id': x,
                                                   },
@@ -260,13 +242,14 @@ class Familiar:
                             self.check = True
                             # Have this ajaxlookup and print Names
                             # Parse for rewards
-                            result = re.search("731d08;\">(.*?)</span>", html7.text)
+                            result = re.search("731d08;\">(.*?)</span>", html5.text)
                             print('[' + str(datetime.datetime.now().time())[:-3] + '] ' +
                                   result.group(1).replace('â\x80\x99', "'").replace('Ã\xB6', "o") + " bonded!")
                             # if 'Death' in result.group(1):
                             #     print(result.group(1).encode())
                             time.sleep(random.uniform(self.mindelay, self.maxdelay))
                         else:
+                            print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Already Bonded with ' + x)
                             self.check = True
                     except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
                         print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Shuffle_3_error_post')
