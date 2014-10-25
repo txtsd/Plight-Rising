@@ -43,7 +43,7 @@ class FRAccount:
                 self.session = pickle.load(f)
         else:
             self.session = requests.Session()
-        a = requests.adapters.HTTPAdapter(max_retries=3)
+        a = requests.adapters.HTTPAdapter(max_retries=0)
         self.session.mount('http://', a)
         self.session.headers = self.headers
 
