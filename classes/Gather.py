@@ -10,6 +10,7 @@ import time
 import datetime
 import random
 import re
+import requests
 from configobj import ConfigObj
 from bs4 import BeautifulSoup as bs
 # End Imports ---------------------------------------------------------
@@ -39,13 +40,26 @@ class Gather:
     def getItems(self, html_):
         things = re.findall("<a rel=\"(.*?)\" class=\"clue\"[\s\S]*?>(\d+?)<\/div>", html_.text)
         for x in things:
-            html = self.acc.get('http://flightrising.com/' + x[0],
-                                head={
-                                    'Accept': 'text/html, */*; q=0.01',
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                },
-                                referer='/main.php?p=gather&action=' + self.action
-                                )
+            self.check = False
+            self.tried = 0
+            while not self.check:
+                if (self.tried < 3):
+                    try:
+                        html = self.acc.get('http://flightrising.com/' + x[0],
+                                            head={
+                                                'Accept': 'text/html, */*; q=0.01',
+                                                'X-Requested-With': 'XMLHttpRequest',
+                                            },
+                                            referer='/main.php?p=gather&action=' + self.action
+                                            )
+                        self.check = True
+                    except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
+                        print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Gather_0_error_getItems')
+                        self.tried += 1
+                        pass
+                else:
+                    print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Bad network. Try again later.')
+                    sys.exit()
             # info = re.findall(">([^\s].*?)<\/div>", html.text)
             # rating = re.search("tooltip_(\d*)star\.", html.text)
             soup = bs(html.text)
@@ -106,57 +120,99 @@ class Gather:
                     print('New type of item found.')
             except:
                 print("Derp", found)
-            print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + x[1] + ' [' + found['subtype'] + '] [' + found['name'] + ']')
-            # for y in info:
-            #     print(' [' + y + ']', end='')
-            # print(' [Rating: ' + rating.group(1) + ']')
+            try:
+                print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + x[1] + ' [' + found['subtype'] + '] [' + found['name'] + ']')
+                # for y in info:
+                #     print(' [' + y + ']', end='')
+                # print(' [Rating: ' + rating.group(1) + ']')
+            except:
+                print('[' + str(datetime.datetime.now().time())[:-3] + '] ' +'Unable to print.')
         if re.search("level_up.png", html_.text):
             print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + "Your [" + self.action + "] leveled up!")
         print("-")
 
     def gather(self):
-        html = self.acc.get('/main.php',
-                            param={
-                                'p': 'gather'
-                            },
-                            referer='/main.php?p=hoard'
-                            )
+        self.check = False
+        self.tried = 0
+        while not self.check:
+            if (self.tried < 3):
+                try:
+                    html = self.acc.get('/main.php',
+                                        param={
+                                            'p': 'gather'
+                                        },
+                                        referer='/main.php?p=hoard'
+                                        )
+                    self.check = True
+                except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
+                    print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Gather_1_error_pregather')
+                    self.tried += 1
+                    pass
+            else:
+                print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Bad network. Try again later.')
+                sys.exit()
         # Parse page, look for remaining turns
         turns = None
         turns = re.search("Turns Left Today:[\s\S]*?(\d+)[\s]*<\/div>", html.text)
         print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Turns remaining today: ' + turns.group(1))
         if (int(turns.group(1)) > 0):
-            time.sleep(random.uniform(2, 4))
-            html2 = self.acc.post('/main.php',
-                                  param={
-                                      'p': 'gather',
-                                      'action': self.action,
-                                  },
-                                  data={
-                                      'gather': self.areachoice,
-                                  },
-                                  head={
-                                      'Cache-Control': 'max-age=0',
-                                  },
-                                  referer='/main.php?p=gather'
-                                  )
+            self.check = False
+            self.tried = 0
+            while not self.check:
+                if (self.tried < 3):
+                    try:
+                        time.sleep(random.uniform(2, 4))
+                        html2 = self.acc.post('/main.php',
+                                              param={
+                                                  'p': 'gather',
+                                                  'action': self.action,
+                                              },
+                                              data={
+                                                  'gather': self.areachoice,
+                                              },
+                                              head={
+                                                  'Cache-Control': 'max-age=0',
+                                              },
+                                              referer='/main.php?p=gather'
+                                              )
+                        self.check = True
+                    except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
+                        print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Gather_2_error_first')
+                        self.tried += 1
+                        pass
+                else:
+                    print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Bad network. Try again later.')
+                    sys.exit()
             # Look for and print acquired items and levelups
             self.getItems(html2)
             for x in range(0, int(turns.group(1)) - 1):
-                time.sleep(random.uniform(1, 2))
-                html3 = self.acc.post('/main.php',
-                                      param={
-                                          'p': 'gather',
-                                          'action': self.action,
-                                      },
-                                      data={
-                                          'gather': self.areachoice,
-                                      },
-                                      head={
-                                          'Cache-Control': 'max-age=0',
-                                      },
-                                      referer='/main.php?p=gather&action=' + self.action
-                                      )
+                self.check = False
+                self.tried = 0
+                while not self.check:
+                    if (self.tried < 3):
+                        try:
+                            time.sleep(random.uniform(1, 2))
+                            html3 = self.acc.post('/main.php',
+                                                  param={
+                                                      'p': 'gather',
+                                                      'action': self.action,
+                                                  },
+                                                  data={
+                                                      'gather': self.areachoice,
+                                                  },
+                                                  head={
+                                                      'Cache-Control': 'max-age=0',
+                                                  },
+                                                  referer='/main.php?p=gather&action=' + self.action
+                                                  )
+                            self.check = True
+                        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
+                            print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Gather_3_error_subsequent')
+                            self.tried += 1
+                            pass
+                    else:
+                        print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Bad network. Try again later.')
+                        sys.exit()
                 # Look for and print acquired items and levelups
                 self.getItems(html3)
         print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Done Gathering')
@@ -165,38 +221,77 @@ class Gather:
         if self.config['account']['pinkerton'] == 'true':
             time.sleep(random.uniform(2, 4))
             print('\n' + '[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Visiting Pinkerton')
-            html4 = self.acc.get('/main.php',
-                                 param={
-                                     'p': 'tradepost',
-                                 },
-                                 referer='/main.php?p=hoard'
-                                 )
-            html5 = self.acc.get('/main.php',
-                                 param={
-                                     'p': 'tradepost',
-                                     'lot': 'pile',
-                                 },
-                                 referer='/main.php?p=tradepost'
-                                 )
+            self.check = False
+            self.tried = 0
+            while not self.check:
+                if (self.tried < 3):
+                    try:
+                        html4 = self.acc.get('/main.php',
+                                             param={
+                                                 'p': 'tradepost',
+                                             },
+                                             referer='/main.php?p=hoard'
+                                             )
+                        html5 = self.acc.get('/main.php',
+                                             param={
+                                                 'p': 'tradepost',
+                                                 'lot': 'pile',
+                                             },
+                                             referer='/main.php?p=tradepost'
+                                             )
+                        self.check = True
+                    except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
+                        print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Gather_4_error_Pinkerton1')
+                        self.tried += 1
+                        pass
+                else:
+                    print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Bad network. Try again later.')
+                    sys.exit()
             if re.search("disabled=\"disabled\"", html5.text):
                 print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + "Already grabbed today's item.")
             else:
                 time.sleep(random.uniform(2, 4))
-                html6 = self.acc.post('/includes/ol/ol_pinkpile.php',
-                                      head={
-                                          'Accept': '*/*',
-                                          'X-Requested-With': 'XMLHttpRequest',
-                                      },
-                                      referer='/main.php?p=tradepost&lot=pile'
-                                      )
+                self.check = False
+                self.tried = 0
+                while not self.check:
+                    if (self.tried < 3):
+                        try:
+                            html6 = self.acc.post('/includes/ol/ol_pinkpile.php',
+                                                  head={
+                                                      'Accept': '*/*',
+                                                      'X-Requested-With': 'XMLHttpRequest',
+                                                  },
+                                                  referer='/main.php?p=tradepost&lot=pile'
+                                                  )
+                            self.check = True
+                        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
+                            print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Gather_5_error_Pinkerton1')
+                            self.tried += 1
+                            pass
+                    else:
+                        print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Bad network. Try again later.')
+                        sys.exit()
                 link = re.search('<a rel=\"(.*?)\" class=\"clue\"[\s\S]*?>', html6.text)
-                html7 = self.acc.get('http://flightrising.com/' + link.group(1),
-                                     head={
-                                         'Accept': 'text/html, */*; q=0.01',
-                                         'X-Requested-With': 'XMLHttpRequest',
-                                     },
-                                     referer='/main.php?p=tradepost&lot=pile'
-                                     )
+                self.check = False
+                self.tried = 0
+                while not self.check:
+                    if (self.tried < 3):
+                        try:
+                            html7 = self.acc.get('http://flightrising.com/' + link.group(1),
+                                                 head={
+                                                     'Accept': 'text/html, */*; q=0.01',
+                                                     'X-Requested-With': 'XMLHttpRequest',
+                                                 },
+                                                 referer='/main.php?p=tradepost&lot=pile'
+                                                 )
+                            self.check = True
+                        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
+                            print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Gather_6_error_Pinkerton2')
+                            self.tried += 1
+                            pass
+                    else:
+                        print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Bad network. Try again later.')
+                        sys.exit()
                 info = re.findall(">([^\s].*?)<\/div>", html7.text)
                 rating = re.search("tooltip_(\d*)star\.", html7.text)
                 print('[' + str(datetime.datetime.now().time())[:-3] + '] ', end='')
@@ -209,11 +304,24 @@ class Gather:
         if self.config['account']['feed'] == 'true':
             time.sleep(random.uniform(2, 4))
             print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Feeding dergs')
-            html8 = self.acc.post('/includes/ol/feed.php',
-                                head={
-                                    'Accept': '*/*',
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                },
-                                referer='/main.php?p=lair&id=' + self.userID
-                                )
+            self.check = False
+            self.tried = 0
+            while not self.check:
+                if (self.tried < 3):
+                    try:
+                        html8 = self.acc.post('/includes/ol/feed.php',
+                                            head={
+                                                'Accept': '*/*',
+                                                'X-Requested-With': 'XMLHttpRequest',
+                                            },
+                                            referer='/main.php?p=lair&id=' + self.userID
+                                            )
+                        self.check = True
+                    except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
+                        print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Gather_7_error_Feed')
+                        self.tried += 1
+                        pass
+                else:
+                    print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Bad network. Try again later.')
+                    sys.exit()
             print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + "Done Feeding\n")
