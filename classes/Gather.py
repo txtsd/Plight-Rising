@@ -13,6 +13,7 @@ import re
 import sys
 import requests
 from configobj import ConfigObj
+from validate import Validator
 from bs4 import BeautifulSoup as bs
 # End Imports ---------------------------------------------------------
 
@@ -22,7 +23,10 @@ class Gather:
     def __init__(self, acc):
         self.acc = acc
         self.userID = acc.getID()
-        self.config = ConfigObj('config.ini')
+        self.configspec = ConfigObj('config.spec', encoding='UTF8', list_values=False)
+        self.config = ConfigObj('config.ini', configspec=self.configspec)
+        val = Validator()
+        test = self.config.validate(val, preserve_errors=True)
         self.area = {'earth': '1',
                      'plague': '2',
                      'wind': '3',

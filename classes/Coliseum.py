@@ -17,6 +17,7 @@ import math
 import os
 import requests
 from configobj import ConfigObj
+from validate import Validator
 from autobahn.asyncio.websocket import WebSocketClientProtocol
 from autobahn.asyncio.websocket import WebSocketClientFactory
 # End Imports ---------------------------------------------------------
@@ -29,7 +30,10 @@ class Coliseum(WebSocketClientProtocol):
 
     def __init__(self):
         self.acc = None
-        self.config = ConfigObj('config.ini')
+        self.configspec = ConfigObj('config.spec', encoding='UTF8', list_values=False)
+        self.config = ConfigObj('config.ini', configspec=self.configspec)
+        val = Validator()
+        test = self.config.validate(val, preserve_errors=True)
         self.mindelay = self.config['account']['coliseum']['mindelay']
         self.maxdelay = self.config['account']['coliseum']['maxdelay']
         self.train = self.config['account']['coliseum']['trainingmode']

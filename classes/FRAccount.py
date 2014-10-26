@@ -14,12 +14,16 @@ import os
 import sys
 import requests
 from configobj import ConfigObj
+from validate import Validator
 # End Imports ---------------------------------------------------------
 
 
 class FRAccount:
 
-    config = ConfigObj('config.ini')
+    configspec = ConfigObj('config.spec', encoding='UTF8', list_values=False)
+    config = ConfigObj('config.ini', configspec=configspec)
+    val = Validator()
+    test = config.validate(val, preserve_errors=True)
     domain = 'http://flightrising.com'
     headers = {
         'User-Agent': config['account']['useragent'],

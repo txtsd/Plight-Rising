@@ -14,6 +14,7 @@ import os
 import sys
 import requests
 from configobj import ConfigObj
+from validate import Validator
 # End Imports ---------------------------------------------------------
 
 
@@ -23,7 +24,10 @@ class Familiar:
         self.acc = acc
         self.userid = acc.getID()
         self.derg = None
-        self.config = ConfigObj('config.ini')
+        self.configspec = ConfigObj('config.spec', encoding='UTF8', list_values=False)
+        self.config = ConfigObj('config.ini', configspec=self.configspec)
+        val = Validator()
+        test = self.config.validate(val, preserve_errors=True)
         self.mindelay = self.config['account']['bond']['mindelay']
         self.maxdelay = self.config['account']['bond']['maxdelay']
         self.check = False
