@@ -34,6 +34,7 @@ class Coliseum(WebSocketClientProtocol):
         self.maxdelay = self.config['account']['coliseum']['maxdelay']
         self.train = self.config['account']['coliseum']['trainingmode']
         self.trainpos = self.config['account']['coliseum']['trainingpos']
+        self.debuglog = self.config['account']['coliseum']['debuglog']
         self.dec = json.JSONDecoder()
         self.wskey = None
         self.connection = None
@@ -140,11 +141,13 @@ class Coliseum(WebSocketClientProtocol):
             Coliseum.longthing = re.search(self.connection + "\.emit\(" + self.thing + "\, \'(.*?)\'\)\;", html.text).group(1)
             # print('test7')
 
-            # print("Beginning WebSocket operations")
-            # print(self.wskey)
-            # print(self.connection)
-            # print(self.thing)
-            # print(Coliseum.longthing, '\n')
+            if self.debuglog:
+                with open(Coliseum.userid + '.log', 'a') as p:
+                    p.write('\n' + "Beginning WebSocket operations" + '\n')
+                    p.write(self.wskey + '\n')
+                    p.write(self.connection + '\n')
+                    p.write(self.thing + '\n')
+                    p.write(Coliseum.longthing + '\n')
 
             factory = WebSocketClientFactory("ws://207.58.158.212:4231/coliseum0/socket.io/1/websocket/" + self.wskey,
                                              debug=False,
@@ -179,14 +182,16 @@ class Coliseum(WebSocketClientProtocol):
     def onMessage(self, payload, isBinary):
         try:
             received = payload.decode('utf-8')
-            # print("<- {}".format(received[:80]))
-            # with open(Coliseum.userid + '.log', 'a') as p:
-            #     p.write("<- {}".format(received) + '\n')
+            if self.debuglog:
+                # print("<- {}".format(received[:80]))
+                with open(Coliseum.userid + '.log', 'a') as p:
+                    p.write("<- {}".format(received) + '\n')
             if (received[:3] == '2::'):
                 self.sendMessage('2::'.encode('utf-8'))
-                # print("-> {}".format('2::'))
-                # with open(Coliseum.userid + '.log', 'a') as p:
-                #     p.write("-> {}".format('2::') + '\n')
+                if self.debuglog:
+                    # print("-> {}".format('2::'))
+                    with open(Coliseum.userid + '.log', 'a') as p:
+                        p.write("-> {}".format('2::') + '\n')
             elif (received[:3] == "1::"):
                 pass
             elif (received[:4] == '5:::'):
@@ -197,16 +202,18 @@ class Coliseum(WebSocketClientProtocol):
                     go = {"name": "coliseum_beginBattle", "args": [{"venue": self.area}]}
                     goforth = "5:::" + json.dumps(go, separators=(',', ':'))
                     self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), self.sendMessage, goforth.encode('utf-8'))
-                    # print("-> {}".format(goforth))
-                    # with open(Coliseum.userid + '.log', 'a') as p:
-                    #     p.write("-> {}".format(goforth) + '\n')
+                    if self.debuglog:
+                        # print("-> {}".format(goforth))
+                        with open(Coliseum.userid + '.log', 'a') as p:
+                            p.write("-> {}".format(goforth) + '\n')
                 elif (msg['name'] == 'l20rj2f2f'):
                     go = {"name": "JMxc-w-wd2DQ", "args": [Coliseum.longthing]}
                     goforth = "5:::" + json.dumps(go, separators=(',', ':'))
                     self.sendMessage(goforth.encode('utf-8'))
-                    # print("-> {}".format(goforth))
-                    # with open(Coliseum.userid + '.log', 'a') as p:
-                    #     p.write("-> {}".format(goforth) + '\n')
+                    if self.debuglog:
+                        # print("-> {}".format(goforth))
+                        with open(Coliseum.userid + '.log', 'a') as p:
+                            p.write("-> {}".format(goforth) + '\n')
                 elif (msg['name'] == 'finalizeBattle'):
                     self.fb = msg
                     teamHP = 0
@@ -220,6 +227,9 @@ class Coliseum(WebSocketClientProtocol):
                             teamMaxHP += float(d['maxHP'])
                             if (teamHP < (teamMaxHP * 0.25)):
                                 print("[--Warning--] Team HP lower than 25%. Aborting.")
+                                if self.debuglog:
+                                    with open(Coliseum.userid + '.log', 'a') as p:
+                                        p.write("----- {}".format("Team HP lower than 25%.") + '\n')
                                 self.loop.stop()
                                 # self.loop.close()
                             if (d['a5'] == 674):
@@ -236,12 +246,18 @@ class Coliseum(WebSocketClientProtocol):
                                 self.fb['args'][0]['playerSet'][i]['agility'] += 1
                         except:
                             print("[--Warning--] Less than 3 dergs in party. Rectify.")
+                            if self.debuglog:
+                                with open(Coliseum.userid + '.log', 'a') as p:
+                                    p.write("----- {}".format("Less than 3 dragons in party.") + '\n')
                             self.loop.stop()
                             # self.loop.close()
                             os.system("pause")
                     # This bit probably doesn't work since it the 3rd dragon entry exists anyway.
                     if (dergcount < 3):
                         print("[--Warning--] Less than 3 dergs in party. Rectify.")
+                        if self.debuglog:
+                            with open(Coliseum.userid + '.log', 'a') as p:
+                                p.write("----- {}".format("Less than 3 dragons in party.") + '\n')
                         self.loop.stop()
                         # self.loop.close()
                         os.system("pause")
@@ -250,9 +266,10 @@ class Coliseum(WebSocketClientProtocol):
                           "args": [{"battleId": self.bId, "user": Coliseum.userid}]}
                     goforth = "5:::" + json.dumps(go, separators=(',', ':'))
                     self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), self.sendMessage, goforth.encode('utf-8'))
-                    # self.loop.call_later(random.uniform(self.mindelay, self.maxdelay) + 0.01, print, "-> {}".format(goforth))
-                    # with open(Coliseum.userid + '.log', 'a') as p:
-                    #     p.write("-> {}".format(goforth) + '\n')
+                    if self.debuglog:
+                        # self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), print, "-> {}".format(goforth))
+                        with open(Coliseum.userid + '.log', 'a') as p:
+                            p.write("-> {}".format(goforth) + '\n')
                 elif (msg['name'] == 'loadedIn'):
                     if not re.search('^e\d+x+', str(self.fb['args'][0]['turnArray'][0]['id'])):
                         self.derg = self.fb['args'][0]['turnArray'][0]
@@ -299,9 +316,10 @@ class Coliseum(WebSocketClientProtocol):
                                               ]
                         goforth = "5:::" + json.dumps(go, separators=(',', ':'))
                         self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), self.sendMessage, goforth.encode('utf-8'))
-                        # self.loop.call_later(random.uniform(self.mindelay, self.maxdelay) + 0.01, print, "-> {}".format(goforth))
-                        # with open(Coliseum.userid + '.log', 'a') as p:
-                        #     p.write("-> {}".format(goforth) + '\n')
+                        if self.debuglog:
+                            # self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), print, "-> {}".format(goforth))
+                            with open(Coliseum.userid + '.log', 'a') as p:
+                                p.write("-> {}".format(goforth) + '\n')
                 elif (msg['name'] == 'finalizeAbility'):
                     self.fa = msg
                     if not self.fa['args'][0]['newTurns'] == 0:
@@ -349,9 +367,10 @@ class Coliseum(WebSocketClientProtocol):
                                                       ]
                                 goforth = "5:::" + json.dumps(go, separators=(',', ':'))
                                 self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), self.sendMessage, goforth.encode('utf-8'))
-                                # self.loop.call_later(random.uniform(self.mindelay, self.maxdelay) + 0.01, print, "-> {}".format(goforth))
-                                # with open(Coliseum.userid + '.log', 'a') as p:
-                                #     p.write("-> {}".format(goforth) + '\n')
+                                if self.debuglog:
+                                    # self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), print, "-> {}".format(goforth))
+                                    with open(Coliseum.userid + '.log', 'a') as p:
+                                        p.write("-> {}".format(goforth) + '\n')
                 elif (msg['name'] == "death"):
                     if self.enemyList:
                         if (self.enemyList[0]['id'] == msg['args'][0]):
@@ -363,6 +382,9 @@ class Coliseum(WebSocketClientProtocol):
                                     print("[--Warning--] " + str(msg['args'][0]) + " died.")
                                     if (self.warning >= 2):
                                         print("[--Warning--] Second derg died. Aborting.")
+                                        if self.debuglog:
+                                            with open(Coliseum.userid + '.log', 'a') as p:
+                                                p.write("----- {}".format("2 dragons dead.") + '\n')
                                         self.warning = 0
                                         self.loop.stop()
                                         # self.loop.close()
@@ -406,9 +428,10 @@ class Coliseum(WebSocketClientProtocol):
                     go = {"name": "coliseum_beginBattle", "args": [{"venue": self.area}]}
                     goforth = "5:::" + json.dumps(go, separators=(',', ':'))
                     self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), self.sendMessage, goforth.encode('utf-8'))
-                    # self.loop.call_later(random.uniform(self.mindelay, self.maxdelay) + 0.01, print, "-> {}".format(goforth))
-                    # with open(Coliseum.userid + '.log', 'a') as p:
-                    #     p.write("-> {}".format(goforth) + '\n')
+                    if self.debuglog:
+                        # self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), print, "-> {}".format(goforth))
+                        with open(Coliseum.userid + '.log', 'a') as p:
+                            p.write("-> {}".format(goforth) + '\n')
         except KeyboardInterrupt:
             sys.exit()
 
