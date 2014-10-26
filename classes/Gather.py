@@ -10,6 +10,7 @@ import time
 import datetime
 import random
 import re
+import sys
 import requests
 from configobj import ConfigObj
 from bs4 import BeautifulSoup as bs
@@ -128,7 +129,7 @@ class Gather:
                 #     print(' [' + y + ']', end='')
                 # print(' [Rating: ' + rating.group(1) + ']')
             except:
-                print('[' + str(datetime.datetime.now().time())[:-3] + '] ' +'Unable to print.')
+                print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Unable to print.')
         if re.search("level_up.png", html_.text):
             print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + "Your [" + self.action + "] leveled up!")
         print("-")
@@ -312,12 +313,12 @@ class Gather:
                 if (self.tried < 3):
                     try:
                         html8 = self.acc.post('/includes/ol/feed.php',
-                                            head={
-                                                'Accept': '*/*',
-                                                'X-Requested-With': 'XMLHttpRequest',
-                                            },
-                                            referer='/main.php?p=lair&id=' + self.userID
-                                            )
+                                              head={
+                                                  'Accept': '*/*',
+                                                  'X-Requested-With': 'XMLHttpRequest',
+                                              },
+                                              referer='/main.php?p=lair&id=' + self.userID
+                                              )
                         self.check = True
                     except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout):
                         print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Gather_7_error_Feed')
