@@ -466,10 +466,10 @@ class Coliseum(WebSocketClientProtocol):
         pass
 
     def getElementalSlash(self, attacker, defender):
-        elemult = getElementalMultipler(attacker, defender)
+        elemult = Coliseum.getElementalMultiplier(attacker, defender)
         return (elemult * ((4 * attacker['strength'] + 75) - (math.floor(defender['defense'] / 3.) * 4 + (defender['defense'] % 3))))
 
-    def getElementalMultipler(attacker, defender):
+    def getElementalMultiplier(attacker, defender):
         multable = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                     [1, 0.5, 1, 0.5, 1, 2, 1, 1, 1, 2, 1, 2],
                     [1, 1, 0.5, 1, 2, 1, 1, 2, 0.5, 1, 2, 1],
@@ -495,11 +495,11 @@ class Coliseum(WebSocketClientProtocol):
         return ((4 * attacker['intellect'] + 19) - (math.floor(defender['mind'] / 3.) * 4 + (defender['mind'] % 3)))
 
     def getElementalBolt(self, attacker, defender):
-        elemult = getElementalMultipler(self, attacker, defender)
+        elemult = Coliseum.getElementalMultiplier(self, attacker, defender)
         return (elemult * ((4 * attacker['intellect'] + 75) - (math.floor(defender['mind'] / 3.) * 4 + (defender['mind'] % 3))))
 
     def getElementalUltimate(self, attacker, defender):
-        elemult = getElementalMultipler(attacker, defender)
+        elemult = Coliseum.getElementalMultiplier(attacker, defender)
         return (elemult * (6 * attacker['intellect'] + 17) - (2 * defender['mind']))
 
     def getEnvenomDOT(self, attacker, defender):
@@ -507,5 +507,5 @@ class Coliseum(WebSocketClientProtocol):
         return ((attacker['intellect'] * 10 + 20) / 5.)
 
     def getEnfeeble(self, attacker, defender):
-        elemult = getElementalMultipler(attacker, defender)
+        elemult = Coliseum.getElementalMultiplier(attacker, defender)
         return (elemult * ((2 * attacker['intellect'] + 100) - math.floor(defender['mind'] / 3.) * 2 + math.round((defender['mind'] % 3) / 3.)))
