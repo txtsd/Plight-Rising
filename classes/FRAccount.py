@@ -26,7 +26,7 @@ class FRAccount:
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         'Accept-Language': 'en-us,en;q=0.8',
         'Accept-Encoding': 'gzip,deflate,sdch',
-        'DNT': '1' if config['account']['DNT'] == 'true' else None
+        'DNT': '1' if config['account']['DNT'] else None
         }
 
     def __init__(self, un, pw, proxy=""):

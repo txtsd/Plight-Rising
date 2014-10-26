@@ -24,8 +24,8 @@ class Familiar:
         self.userid = acc.getID()
         self.derg = None
         self.config = ConfigObj('config.ini')
-        self.mindelay = float(self.config['account']['bond']['mindelay'])
-        self.maxdelay = float(self.config['account']['bond']['maxdelay'])
+        self.mindelay = self.config['account']['bond']['mindelay']
+        self.maxdelay = self.config['account']['bond']['maxdelay']
         self.check = False
         self.tried = 0
 

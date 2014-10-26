@@ -14,13 +14,20 @@ import random
 import datetime
 from pytz import timezone
 from configobj import ConfigObj
+from validate import Validator
 from classes.FRAccount import FRAccount
 from classes.Familiar import Familiar
 from classes.Gather import Gather
 from classes.Coliseum import Coliseum
 # End Imports ---------------------------------------------------------
 
-config = ConfigObj('config.ini')
+configspec = ConfigObj('config.spec', encoding='UTF8', list_values=False)
+config = ConfigObj('config.ini', configspec=configspec)
+val = Validator()
+test = config.validate(val, preserve_errors=True)
+if not test is True:
+    print(test)
+    sys.exit()
 
 if config['account']['username'] or (not config['account']['username'] == 'herp' and config['account']['password'] == 'derp'):
     fruser = config['account']['username']

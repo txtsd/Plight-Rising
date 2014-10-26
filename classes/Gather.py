@@ -36,6 +36,8 @@ class Gather:
                      }
         self.areachoice = self.area[self.config['account']['gather']['area']]
         self.action = self.config['account']['gather']['action']
+        self.pinkerton = self.config['account']['pinkerton']
+        self.feed = self.config['account']['feed']:
 
     def getItems(self, html_):
         things = re.findall("<a rel=\"(.*?)\" class=\"clue\"[\s\S]*?>(\d+?)<\/div>", html_.text)
@@ -218,7 +220,7 @@ class Gather:
         print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Done Gathering')
 
         # Pinkerton section
-        if self.config['account']['pinkerton'] == 'true':
+        if self.pinkerton:
             time.sleep(random.uniform(2, 4))
             print('\n' + '[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Visiting Pinkerton')
             self.check = False
@@ -301,7 +303,7 @@ class Gather:
             print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + "Done Pinking\n")
 
         # Feeding section
-        if self.config['account']['feed'] == 'true':
+        if self.feed:
             time.sleep(random.uniform(2, 4))
             print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + 'Feeding dergs')
             self.check = False

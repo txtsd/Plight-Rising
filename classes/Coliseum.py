@@ -30,8 +30,10 @@ class Coliseum(WebSocketClientProtocol):
     def __init__(self):
         self.acc = None
         self.config = ConfigObj('config.ini')
-        self.mindelay = float(self.config['account']['coliseum']['mindelay'])
-        self.maxdelay = float(self.config['account']['coliseum']['maxdelay'])
+        self.mindelay = self.config['account']['coliseum']['mindelay']
+        self.maxdelay = self.config['account']['coliseum']['maxdelay']
+        self.train = self.config['account']['coliseum']['trainingmode']
+        self.trainpos = self.config['account']['coliseum']['trainingpos']
         self.dec = json.JSONDecoder()
         self.wskey = None
         self.connection = None
@@ -45,7 +47,7 @@ class Coliseum(WebSocketClientProtocol):
         self.headers = {'Origin': 'http://flightrising.com',
                         'Accept-Encoding': 'gzip,deflate,sdch',
                         'Accept-Language': 'en-US,en;q=0.8',
-                        'DNT': '1' if self.config['account']['DNT'] == 'true' else None
+                        'DNT': '1' if self.config['account']['DNT'] else None
                         }
         self.useragent = self.config['account']['useragent']
         # training_fields, woodland_border, scorched_forest, sandswept_delta, forgotten_cave,
@@ -190,7 +192,7 @@ class Coliseum(WebSocketClientProtocol):
             elif (received[:4] == '5:::'):
                 msgpre = received[4:]
                 msg = self.dec.decode(msgpre)
-                delay = random.uniform(self.mindelay, float(self.config['account']['coliseum']['maxdelay']))
+                delay = random.uniform(self.mindelay, self.maxdelay)
                 if (msg['name'] == 'gotoTitle'):
                     go = {"name": "coliseum_beginBattle", "args": [{"venue": self.area}]}
                     goforth = "5:::" + json.dumps(go, separators=(',', ':'))
@@ -390,9 +392,9 @@ class Coliseum(WebSocketClientProtocol):
                             f.write('\n')
                     ### End adding data to file ###
 
-                    if self.config['account']['coliseum']['trainingmode'] == 'true':
-                        print("[Level]", str(self.fb['args'][0]['playerSet'][int(self.config['account']['coliseum']['trainingpos'])]['level']),
-                              " [Exp]", str(self.fb['args'][0]['playerSet'][int(self.config['account']['coliseum']['trainingpos'])]['xp_now']))
+                    if self.train:
+                        print("[Level]", str(self.fb['args'][0]['playerSet'][self.trainpos]['level']),
+                              " [Exp]", str(self.fb['args'][0]['playerSet'][self.trainpos]['xp_now']))
                     self.derg = None
                     self.enemyList = []
                     self.fb = None
