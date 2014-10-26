@@ -197,7 +197,6 @@ class Coliseum(WebSocketClientProtocol):
             elif (received[:4] == '5:::'):
                 msgpre = received[4:]
                 msg = self.dec.decode(msgpre)
-                delay = random.uniform(self.mindelay, self.maxdelay)
                 if (msg['name'] == 'gotoTitle'):
                     go = {"name": "coliseum_beginBattle", "args": [{"venue": self.area}]}
                     goforth = "5:::" + json.dumps(go, separators=(',', ':'))
