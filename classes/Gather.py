@@ -37,7 +37,7 @@ class Gather:
         self.areachoice = self.area[self.config['account']['gather']['area']]
         self.action = self.config['account']['gather']['action']
         self.pinkerton = self.config['account']['pinkerton']
-        self.feed = self.config['account']['feed']:
+        self.feed = self.config['account']['feed']
 
     def getItems(self, html_):
         things = re.findall("<a rel=\"(.*?)\" class=\"clue\"[\s\S]*?>(\d+?)<\/div>", html_.text)
