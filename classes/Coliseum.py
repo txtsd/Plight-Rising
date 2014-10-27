@@ -164,8 +164,11 @@ class Coliseum(WebSocketClientProtocol):
             try:
                 self.loop.run_until_complete(coro)
                 self.loop.run_forever()
-            # except:
-            #     pass
+            except KeyboardInterrupt:
+                if self.debuglog:
+                    with open(Coliseum.userid + '.log', 'a') as p:
+                        p.write("----- {}".format("KeyboardInterrupt") + '\n')
+                sys.exit()
             finally:
                 self.loop.stop()
                 # self.loop.close()
