@@ -291,28 +291,67 @@ class Coliseum(WebSocketClientProtocol):
                                     self.enemyList.append(e)
                                     break
                     go = {"name": "coliseum_useAbility"}
-                    if self.derg['breath'] < 35:
-                        go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
-                                       "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
-                                       "ability": "1", "abilityId": str(random.randint(111, 999)),
-                                       "battleId": self.bId,
-                                       "aoeTargets": []}
-                                      ]
-                    if self.derg['breath'] >= 35:
-                        if (self.getScratch(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']):
+
+                    if (self.hasScratch(self.derg)):
+                        if (self.derg['breath'] < 10):
                             go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
                                            "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
                                            "ability": "1", "abilityId": str(random.randint(111, 999)),
                                            "battleId": self.bId,
                                            "aoeTargets": []}
                                           ]
-                        elif (self.getEliminate(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']):
-                            go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
-                                           "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
-                                           "ability": "4", "abilityId": str(random.randint(111, 999)),
-                                           "battleId": self.bId,
-                                           "aoeTargets": []}
-                                          ]
+                        elif (self.derg['breath'] >= 10) and (self.derg['breath'] < 35):
+                            if (self.getScratch(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']):
+                                go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                               "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
+                                               "ability": "1", "abilityId": str(random.randint(111, 999)),
+                                               "battleId": self.bId,
+                                               "aoeTargets": []}
+                                              ]
+                            elif (self.getShred(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']) and (self.hasShred(self.derg)) and (not self.hasEliminate(self.derg)):  ### AND if derg has Shred ###
+                                go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                               "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
+                                               "ability": "3", "abilityId": str(random.randint(111, 999)),
+                                               "battleId": self.bId,
+                                               "aoeTargets": []}
+                                              ]
+                            elif (self.getFullHPEnemy(self.enemyList)) and (self.hasShred(self.derg)) and (not self.hasEliminate(self.derg)):  ### another enemy has full HP AND derg has Shred ###
+                                datEnemy = self.getFullHPEnemy(self.enemyList)
+                                go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                               "target": {"id": self.enemyList[datEnemy]['id'], "ai": self.enemyList[datEnemy]['ai']},  ### Has to be the newfound enemy ###
+                                               "ability": "3", "abilityId": str(random.randint(111, 999)),
+                                               "battleId": self.bId,
+                                               "aoeTargets": []}
+                                              ]
+                            else:
+                                go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                               "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
+                                               "ability": "1", "abilityId": str(random.randint(111, 999)),
+                                               "battleId": self.bId,
+                                               "aoeTargets": []}
+                                              ]
+                        elif (self.derg['breath'] >= 35):
+                            if (self.getScratch(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']):
+                                go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                               "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
+                                               "ability": "1", "abilityId": str(random.randint(111, 999)),
+                                               "battleId": self.bId,
+                                               "aoeTargets": []}
+                                              ]
+                            elif (self.getEliminate(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']) and (self.hasEliminate(self.derg)):  ### AND if derg has Eliminate ###
+                                go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                               "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
+                                               "ability": "4", "abilityId": str(random.randint(111, 999)),
+                                               "battleId": self.bId,
+                                               "aoeTargets": []}
+                                              ]
+                            else:
+                                go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                               "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
+                                               "ability": "1", "abilityId": str(random.randint(111, 999)),
+                                               "battleId": self.bId,
+                                               "aoeTargets": []}
+                                              ]
                         else:
                             go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
                                            "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
@@ -320,6 +359,10 @@ class Coliseum(WebSocketClientProtocol):
                                            "battleId": self.bId,
                                            "aoeTargets": []}
                                           ]
+                    else:
+                        print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + self.derg['dragonname'] + "does not have Scratch!")
+                        self.loop.close()
+
                     goforth = "5:::" + json.dumps(go, separators=(',', ':'))
                     self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), self.sendMessage, goforth.encode('utf-8'))
                     if self.debuglog:
@@ -337,28 +380,67 @@ class Coliseum(WebSocketClientProtocol):
                                     # print(str(self.fb['args'][0]['enemySet'][i]['id']) + ' ' + str(self.fb['args'][0]['enemySet'][i]['health']))
                             self.derg = self.fa['args'][0]['newTurns']['array'][0]
                             go = {"name": "coliseum_useAbility"}
-                            if self.derg['breath'] < 35:
-                                go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
-                                               "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
-                                               "ability": "1", "abilityId": str(random.randint(111, 999)),
-                                               "battleId": self.bId,
-                                               "aoeTargets": []}
-                                              ]
-                            if self.derg['breath'] >= 35:
-                                if (self.getScratch(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']):
+
+                            if (self.hasScratch(self.derg)):
+                                if (self.derg['breath'] < 10):
                                     go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
                                                    "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
                                                    "ability": "1", "abilityId": str(random.randint(111, 999)),
                                                    "battleId": self.bId,
                                                    "aoeTargets": []}
                                                   ]
-                                elif (self.getEliminate(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']):
-                                    go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
-                                                   "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
-                                                   "ability": "4", "abilityId": str(random.randint(111, 999)),
-                                                   "battleId": self.bId,
-                                                   "aoeTargets": []}
-                                                  ]
+                                elif (self.derg['breath'] >= 10) and (self.derg['breath'] < 35):
+                                    if (self.getScratch(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']):
+                                        go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                                       "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
+                                                       "ability": "1", "abilityId": str(random.randint(111, 999)),
+                                                       "battleId": self.bId,
+                                                       "aoeTargets": []}
+                                                      ]
+                                    elif (self.getShred(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']) and (self.hasShred(self.derg)) and (not self.hasEliminate(self.derg)):  ### AND if derg has Shred ###
+                                        go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                                       "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
+                                                       "ability": "3", "abilityId": str(random.randint(111, 999)),
+                                                       "battleId": self.bId,
+                                                       "aoeTargets": []}
+                                                      ]
+                                    elif (self.getFullHPEnemy(self.enemyList)) and (self.hasShred(self.derg)) and (not self.hasEliminate(self.derg)):  ### another enemy has full HP AND derg has Shred ###
+                                        datEnemy = self.getFullHPEnemy(self.enemyList)
+                                        go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                                       "target": {"id": self.enemyList[datEnemy]['id'], "ai": self.enemyList[datEnemy]['ai']},  ### Has to be the newfound enemy ###
+                                                       "ability": "3", "abilityId": str(random.randint(111, 999)),
+                                                       "battleId": self.bId,
+                                                       "aoeTargets": []}
+                                                      ]
+                                    else:
+                                        go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                                       "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
+                                                       "ability": "1", "abilityId": str(random.randint(111, 999)),
+                                                       "battleId": self.bId,
+                                                       "aoeTargets": []}
+                                                      ]
+                                elif (self.derg['breath'] >= 35):
+                                    if (self.getScratch(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']):
+                                        go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                                       "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
+                                                       "ability": "1", "abilityId": str(random.randint(111, 999)),
+                                                       "battleId": self.bId,
+                                                       "aoeTargets": []}
+                                                      ]
+                                    elif (self.getEliminate(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']) and (self.hasEliminate(self.derg)):  ### AND if derg has Eliminate ###
+                                        go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                                       "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
+                                                       "ability": "4", "abilityId": str(random.randint(111, 999)),
+                                                       "battleId": self.bId,
+                                                       "aoeTargets": []}
+                                                      ]
+                                    else:
+                                        go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                                       "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
+                                                       "ability": "1", "abilityId": str(random.randint(111, 999)),
+                                                       "battleId": self.bId,
+                                                       "aoeTargets": []}
+                                                      ]
                                 else:
                                     go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
                                                    "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
@@ -366,6 +448,10 @@ class Coliseum(WebSocketClientProtocol):
                                                    "battleId": self.bId,
                                                    "aoeTargets": []}
                                                   ]
+                            else:
+                                print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + self.derg['dragonname'] + "does not have Scratch!")
+                                self.loop.close()
+
                             goforth = "5:::" + json.dumps(go, separators=(',', ':'))
                             self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), self.sendMessage, goforth.encode('utf-8'))
                             if self.debuglog:
