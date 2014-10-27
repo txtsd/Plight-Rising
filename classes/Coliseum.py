@@ -379,7 +379,7 @@ class Coliseum(WebSocketClientProtocol):
                         for x in self.fb['args'][0]['playerSet']:
                             if (x['id'] == msg['args'][0]):
                                 self.warning += 1
-                                print("[--Warning--] " + str(msg['args'][0]) + " died.")
+                                print("[--Warning--] " + str(x['dragonname']) + " died.")
                                 if (self.warning >= 2):
                                     print("[--Warning--] Second derg died. Aborting.")
                                     if self.debuglog:
