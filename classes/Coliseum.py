@@ -45,6 +45,7 @@ class Coliseum(WebSocketClientProtocol):
         self.thing = None
         self.fb = None
         self.fa = None
+        self.popped = False
         self.enemyList = []
         self.readyToFight = 0
         self.warning = 0
@@ -372,10 +373,13 @@ class Coliseum(WebSocketClientProtocol):
                                 with open(Coliseum.userid + '.log', 'a') as p:
                                     p.write("-> {}".format(goforth) + '\n')
             elif (msg['name'] == "death"):
+                self.popped = False
                 if self.enemyList:
-                    if (self.enemyList[0]['id'] == msg['args'][0]):
-                        self.enemyList.pop(0)
-                    else:
+                    for i, x in enumerate(self.enemyList):
+                        if (x['id'] == msg['args'][0]):
+                            self.enemyList.pop(i)
+                            self.popped = True
+                    if not self.popped:
                         for x in self.fb['args'][0]['playerSet']:
                             if (x['id'] == msg['args'][0]):
                                 self.warning += 1
