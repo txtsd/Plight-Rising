@@ -308,17 +308,17 @@ class Coliseum(WebSocketClientProtocol):
                                                "battleId": self.bId,
                                                "aoeTargets": []}
                                               ]
-                            elif (self.getShred(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']) and (self.hasShred(self.derg)) and (not self.hasEliminate(self.derg)):  ### AND if derg has Shred ###
+                            elif (self.getShred(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']) and (self.hasShred(self.derg)) and (not self.hasEliminate(self.derg)):
                                 go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
                                                "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
                                                "ability": "3", "abilityId": str(random.randint(111, 999)),
                                                "battleId": self.bId,
                                                "aoeTargets": []}
                                               ]
-                            elif (self.getFullHPEnemy(self.enemyList)) and (self.hasShred(self.derg)) and (not self.hasEliminate(self.derg)):  ### another enemy has full HP AND derg has Shred ###
+                            elif (self.getFullHPEnemy(self.enemyList)) and (self.hasShred(self.derg)) and (not self.hasEliminate(self.derg)):
                                 datEnemy = self.getFullHPEnemy(self.enemyList)
                                 go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
-                                               "target": {"id": self.enemyList[datEnemy]['id'], "ai": self.enemyList[datEnemy]['ai']},  ### Has to be the newfound enemy ###
+                                               "target": {"id": self.enemyList[datEnemy]['id'], "ai": self.enemyList[datEnemy]['ai']},
                                                "ability": "3", "abilityId": str(random.randint(111, 999)),
                                                "battleId": self.bId,
                                                "aoeTargets": []}
@@ -338,7 +338,7 @@ class Coliseum(WebSocketClientProtocol):
                                                "battleId": self.bId,
                                                "aoeTargets": []}
                                               ]
-                            elif (self.getEliminate(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']) and (self.hasEliminate(self.derg)):  ### AND if derg has Eliminate ###
+                            elif (self.getEliminate(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']) and (self.hasEliminate(self.derg)):
                                 go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
                                                "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
                                                "ability": "4", "abilityId": str(random.randint(111, 999)),
@@ -397,17 +397,17 @@ class Coliseum(WebSocketClientProtocol):
                                                        "battleId": self.bId,
                                                        "aoeTargets": []}
                                                       ]
-                                    elif (self.getShred(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']) and (self.hasShred(self.derg)) and (not self.hasEliminate(self.derg)):  ### AND if derg has Shred ###
+                                    elif (self.getShred(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']) and (self.hasShred(self.derg)) and (not self.hasEliminate(self.derg)):
                                         go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
                                                        "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
                                                        "ability": "3", "abilityId": str(random.randint(111, 999)),
                                                        "battleId": self.bId,
                                                        "aoeTargets": []}
                                                       ]
-                                    elif (self.getFullHPEnemy(self.enemyList)) and (self.hasShred(self.derg)) and (not self.hasEliminate(self.derg)):  ### another enemy has full HP AND derg has Shred ###
+                                    elif (self.getFullHPEnemy(self.enemyList)) and (self.hasShred(self.derg)) and (not self.hasEliminate(self.derg)):
                                         datEnemy = self.getFullHPEnemy(self.enemyList)
                                         go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
-                                                       "target": {"id": self.enemyList[datEnemy]['id'], "ai": self.enemyList[datEnemy]['ai']},  ### Has to be the newfound enemy ###
+                                                       "target": {"id": self.enemyList[datEnemy]['id'], "ai": self.enemyList[datEnemy]['ai']},
                                                        "ability": "3", "abilityId": str(random.randint(111, 999)),
                                                        "battleId": self.bId,
                                                        "aoeTargets": []}
@@ -427,7 +427,7 @@ class Coliseum(WebSocketClientProtocol):
                                                        "battleId": self.bId,
                                                        "aoeTargets": []}
                                                       ]
-                                    elif (self.getEliminate(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']) and (self.hasEliminate(self.derg)):  ### AND if derg has Eliminate ###
+                                    elif (self.getEliminate(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']) and (self.hasEliminate(self.derg)):
                                         go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
                                                        "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
                                                        "ability": "4", "abilityId": str(random.randint(111, 999)),
