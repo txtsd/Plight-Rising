@@ -436,6 +436,9 @@ class Coliseum(WebSocketClientProtocol):
                         with open(Coliseum.userid + '.log', 'a') as p:
                             p.write("-> {}".format(goforth) + '\n')
         except KeyboardInterrupt:
+            if self.debuglog:
+                with open(Coliseum.userid + '.log', 'a') as p:
+                    p.write("----- {}".format("KeyboardInterrupt") + '\n')
             sys.exit()
 
     def onClose(self, wasClean, code, reason):
