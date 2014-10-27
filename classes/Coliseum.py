@@ -187,79 +187,69 @@ class Coliseum(WebSocketClientProtocol):
         print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + "WebSocket connection open.")
 
     def onMessage(self, payload, isBinary):
-        try:
-            received = payload.decode('utf-8')
+        received = payload.decode('utf-8')
+        if self.debuglog:
+            # print("<- {}".format(received[:80]))
+            with open(Coliseum.userid + '.log', 'a') as p:
+                p.write("<- {}".format(received) + '\n')
+        if (received[:3] == '2::'):
+            self.sendMessage('2::'.encode('utf-8'))
             if self.debuglog:
-                # print("<- {}".format(received[:80]))
+                # print("-> {}".format('2::'))
                 with open(Coliseum.userid + '.log', 'a') as p:
-                    p.write("<- {}".format(received) + '\n')
-            if (received[:3] == '2::'):
-                self.sendMessage('2::'.encode('utf-8'))
+                    p.write("-> {}".format('2::') + '\n')
+        elif (received[:3] == "1::"):
+            pass
+        elif (received[:4] == '5:::'):
+            msgpre = received[4:]
+            msg = self.dec.decode(msgpre)
+            if (msg['name'] == 'gotoTitle'):
+                go = {"name": "coliseum_beginBattle", "args": [{"venue": self.area}]}
+                goforth = "5:::" + json.dumps(go, separators=(',', ':'))
+                self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), self.sendMessage, goforth.encode('utf-8'))
                 if self.debuglog:
-                    # print("-> {}".format('2::'))
+                    # print("-> {}".format(goforth))
                     with open(Coliseum.userid + '.log', 'a') as p:
-                        p.write("-> {}".format('2::') + '\n')
-            elif (received[:3] == "1::"):
-                pass
-            elif (received[:4] == '5:::'):
-                msgpre = received[4:]
-                msg = self.dec.decode(msgpre)
-                if (msg['name'] == 'gotoTitle'):
-                    go = {"name": "coliseum_beginBattle", "args": [{"venue": self.area}]}
-                    goforth = "5:::" + json.dumps(go, separators=(',', ':'))
-                    self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), self.sendMessage, goforth.encode('utf-8'))
-                    if self.debuglog:
-                        # print("-> {}".format(goforth))
-                        with open(Coliseum.userid + '.log', 'a') as p:
-                            p.write("-> {}".format(goforth) + '\n')
-                elif (msg['name'] == 'l20rj2f2f'):
-                    go = {"name": "JMxc-w-wd2DQ", "args": [Coliseum.longthing]}
-                    goforth = "5:::" + json.dumps(go, separators=(',', ':'))
-                    self.sendMessage(goforth.encode('utf-8'))
-                    if self.debuglog:
-                        # print("-> {}".format(goforth))
-                        with open(Coliseum.userid + '.log', 'a') as p:
-                            p.write("-> {}".format(goforth) + '\n')
-                elif (msg['name'] == 'finalizeBattle'):
-                    self.fb = msg
-                    teamHP = 0
-                    teamMaxHP = 0
-                    self.warning = 0
-                    dergcount = 0
-                    for i, d in enumerate(self.fb['args'][0]['playerSet']):
-                        try:
-                            dergcount += 1
-                            teamHP += float(d['health'])
-                            teamMaxHP += float(d['maxHP'])
-                            if (teamHP < (teamMaxHP * 0.25)):
-                                print("[--Warning--] Team HP lower than 25%. Aborting.")
-                                if self.debuglog:
-                                    with open(Coliseum.userid + '.log', 'a') as p:
-                                        p.write("----- {}".format("Team HP lower than 25%.") + '\n')
-                                self.loop.stop()
-                                # self.loop.close()
-                            if (d['a5'] == 674):
-                                self.fb['args'][0]['playerSet'][i]['strength'] += 5
-                                self.fb['args'][0]['playerSet'][i]['quickness'] += 3
-                                self.fb['args'][0]['playerSet'][i]['agility'] += 1
-                            if (d['a6'] == 674):
-                                self.fb['args'][0]['playerSet'][i]['strength'] += 5
-                                self.fb['args'][0]['playerSet'][i]['quickness'] += 3
-                                self.fb['args'][0]['playerSet'][i]['agility'] += 1
-                            if (d['a7'] == 674):
-                                self.fb['args'][0]['playerSet'][i]['strength'] += 5
-                                self.fb['args'][0]['playerSet'][i]['quickness'] += 3
-                                self.fb['args'][0]['playerSet'][i]['agility'] += 1
-                        except:
-                            print("[--Warning--] Less than 3 dergs in party. Rectify.")
+                        p.write("-> {}".format(goforth) + '\n')
+            elif (msg['name'] == 'l20rj2f2f'):
+                go = {"name": "JMxc-w-wd2DQ", "args": [Coliseum.longthing]}
+                goforth = "5:::" + json.dumps(go, separators=(',', ':'))
+                self.sendMessage(goforth.encode('utf-8'))
+                if self.debuglog:
+                    # print("-> {}".format(goforth))
+                    with open(Coliseum.userid + '.log', 'a') as p:
+                        p.write("-> {}".format(goforth) + '\n')
+            elif (msg['name'] == 'finalizeBattle'):
+                self.fb = msg
+                teamHP = 0
+                teamMaxHP = 0
+                self.warning = 0
+                dergcount = 0
+                for i, d in enumerate(self.fb['args'][0]['playerSet']):
+                    try:
+                        dergcount += 1
+                        teamHP += float(d['health'])
+                        teamMaxHP += float(d['maxHP'])
+                        if (teamHP < (teamMaxHP * 0.25)):
+                            print("[--Warning--] Team HP lower than 25%. Aborting.")
                             if self.debuglog:
                                 with open(Coliseum.userid + '.log', 'a') as p:
-                                    p.write("----- {}".format("Less than 3 dragons in party.") + '\n')
+                                    p.write("----- {}".format("Team HP lower than 25%.") + '\n')
                             self.loop.stop()
                             # self.loop.close()
-                            os.system("pause")
-                    # This bit probably doesn't work since it the 3rd dragon entry exists anyway.
-                    if (dergcount < 3):
+                        if (d['a5'] == 674):
+                            self.fb['args'][0]['playerSet'][i]['strength'] += 5
+                            self.fb['args'][0]['playerSet'][i]['quickness'] += 3
+                            self.fb['args'][0]['playerSet'][i]['agility'] += 1
+                        if (d['a6'] == 674):
+                            self.fb['args'][0]['playerSet'][i]['strength'] += 5
+                            self.fb['args'][0]['playerSet'][i]['quickness'] += 3
+                            self.fb['args'][0]['playerSet'][i]['agility'] += 1
+                        if (d['a7'] == 674):
+                            self.fb['args'][0]['playerSet'][i]['strength'] += 5
+                            self.fb['args'][0]['playerSet'][i]['quickness'] += 3
+                            self.fb['args'][0]['playerSet'][i]['agility'] += 1
+                    except:
                         print("[--Warning--] Less than 3 dergs in party. Rectify.")
                         if self.debuglog:
                             with open(Coliseum.userid + '.log', 'a') as p:
@@ -267,182 +257,186 @@ class Coliseum(WebSocketClientProtocol):
                         self.loop.stop()
                         # self.loop.close()
                         os.system("pause")
-                    self.bId = msg['args'][0]['battleId']
-                    go = {"name": "coliseum_battleLoaded",
-                          "args": [{"battleId": self.bId, "user": Coliseum.userid}]}
-                    goforth = "5:::" + json.dumps(go, separators=(',', ':'))
-                    self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), self.sendMessage, goforth.encode('utf-8'))
+                # This bit probably doesn't work since it the 3rd dragon entry exists anyway.
+                if (dergcount < 3):
+                    print("[--Warning--] Less than 3 dergs in party. Rectify.")
                     if self.debuglog:
-                        # self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), print, "-> {}".format(goforth))
                         with open(Coliseum.userid + '.log', 'a') as p:
-                            p.write("-> {}".format(goforth) + '\n')
-                elif (msg['name'] == 'loadedIn'):
-                    if not re.search('^e\d+x+', str(self.fb['args'][0]['turnArray'][0]['id'])):
-                        self.derg = self.fb['args'][0]['turnArray'][0]
-                        for e in self.fb['args'][0]['enemySet']:
-                            if not self.enemyList:
-                                self.enemyList.append(e)
-                            else:
-                                for i, y in enumerate(self.enemyList):
-                                    if self.order[str(e['realid'])] <= self.order[str(y['realid'])]:
-                                        self.enemyList.insert(i, e)
-                                        break
-                                    else:
-                                        self.enemyList.append(e)
-                                        break
-                        go = {"name": "coliseum_useAbility"}
-                        if self.derg['breath'] < 35:
+                            p.write("----- {}".format("Less than 3 dragons in party.") + '\n')
+                    self.loop.stop()
+                    # self.loop.close()
+                    os.system("pause")
+                self.bId = msg['args'][0]['battleId']
+                go = {"name": "coliseum_battleLoaded",
+                      "args": [{"battleId": self.bId, "user": Coliseum.userid}]}
+                goforth = "5:::" + json.dumps(go, separators=(',', ':'))
+                self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), self.sendMessage, goforth.encode('utf-8'))
+                if self.debuglog:
+                    # self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), print, "-> {}".format(goforth))
+                    with open(Coliseum.userid + '.log', 'a') as p:
+                        p.write("-> {}".format(goforth) + '\n')
+            elif (msg['name'] == 'loadedIn'):
+                if not re.search('^e\d+x+', str(self.fb['args'][0]['turnArray'][0]['id'])):
+                    self.derg = self.fb['args'][0]['turnArray'][0]
+                    for e in self.fb['args'][0]['enemySet']:
+                        if not self.enemyList:
+                            self.enemyList.append(e)
+                        else:
+                            for i, y in enumerate(self.enemyList):
+                                if self.order[str(e['realid'])] <= self.order[str(y['realid'])]:
+                                    self.enemyList.insert(i, e)
+                                    break
+                                else:
+                                    self.enemyList.append(e)
+                                    break
+                    go = {"name": "coliseum_useAbility"}
+                    if self.derg['breath'] < 35:
+                        go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                       "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
+                                       "ability": "1", "abilityId": str(random.randint(111, 999)),
+                                       "battleId": self.bId,
+                                       "aoeTargets": []}
+                                      ]
+                    if self.derg['breath'] >= 35:
+                        if (self.getScratch(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']):
                             go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
                                            "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
                                            "ability": "1", "abilityId": str(random.randint(111, 999)),
                                            "battleId": self.bId,
                                            "aoeTargets": []}
                                           ]
-                        if self.derg['breath'] >= 35:
-                            if (self.getScratch(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']):
-                                go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
-                                               "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
-                                               "ability": "1", "abilityId": str(random.randint(111, 999)),
-                                               "battleId": self.bId,
-                                               "aoeTargets": []}
-                                              ]
-                            elif (self.getEliminate(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']):
-                                go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
-                                               "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
-                                               "ability": "4", "abilityId": str(random.randint(111, 999)),
-                                               "battleId": self.bId,
-                                               "aoeTargets": []}
-                                              ]
-                            else:
-                                go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
-                                               "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
-                                               "ability": "1", "abilityId": str(random.randint(111, 999)),
-                                               "battleId": self.bId,
-                                               "aoeTargets": []}
-                                              ]
-                        goforth = "5:::" + json.dumps(go, separators=(',', ':'))
-                        self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), self.sendMessage, goforth.encode('utf-8'))
-                        if self.debuglog:
-                            # self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), print, "-> {}".format(goforth))
-                            with open(Coliseum.userid + '.log', 'a') as p:
-                                p.write("-> {}".format(goforth) + '\n')
-                elif (msg['name'] == 'finalizeAbility'):
-                    self.fa = msg
-                    if not self.fa['args'][0]['newTurns'] == 0:
-                        if not re.search('^e\d+x+', str(self.fa['args'][0]['newTurns']['array'][0]['id'])):
-                            if self.enemyList:
-                                # for d in self.fa['args'][0]['newTurns']['array']:
-                                #     if ((float(d['health']) < float((d['maxHP'])*0.25)) and d['team'] == 1):
-                                #         self.loop.stop()
-                                #         self.loop.close()
-                                #         sys.exit()
-                                for i, x in enumerate(self.fb['args'][0]['enemySet']):
-                                    if x['id'] == self.fa['args'][0]['target']:
-                                        self.fb['args'][0]['enemySet'][i]['health'] -= self.fa['args'][0]['damage']
-                                        # print(str(self.fb['args'][0]['enemySet'][i]['id']) + ' ' + str(self.fb['args'][0]['enemySet'][i]['health']))
-                                self.derg = self.fa['args'][0]['newTurns']['array'][0]
-                                go = {"name": "coliseum_useAbility"}
-                                if self.derg['breath'] < 35:
-                                    go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
-                                                   "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
-                                                   "ability": "1", "abilityId": str(random.randint(111, 999)),
-                                                   "battleId": self.bId,
-                                                   "aoeTargets": []}
-                                                  ]
-                                if self.derg['breath'] >= 35:
-                                    if (self.getScratch(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']):
-                                        go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
-                                                       "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
-                                                       "ability": "1", "abilityId": str(random.randint(111, 999)),
-                                                       "battleId": self.bId,
-                                                       "aoeTargets": []}
-                                                      ]
-                                    elif (self.getEliminate(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']):
-                                        go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
-                                                       "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
-                                                       "ability": "4", "abilityId": str(random.randint(111, 999)),
-                                                       "battleId": self.bId,
-                                                       "aoeTargets": []}
-                                                      ]
-                                    else:
-                                        go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
-                                                       "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
-                                                       "ability": "1", "abilityId": str(random.randint(111, 999)),
-                                                       "battleId": self.bId,
-                                                       "aoeTargets": []}
-                                                      ]
-                                goforth = "5:::" + json.dumps(go, separators=(',', ':'))
-                                self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), self.sendMessage, goforth.encode('utf-8'))
-                                if self.debuglog:
-                                    # self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), print, "-> {}".format(goforth))
-                                    with open(Coliseum.userid + '.log', 'a') as p:
-                                        p.write("-> {}".format(goforth) + '\n')
-                elif (msg['name'] == "death"):
-                    if self.enemyList:
-                        if (self.enemyList[0]['id'] == msg['args'][0]):
-                            self.enemyList.pop(0)
+                        elif (self.getEliminate(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']):
+                            go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                           "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
+                                           "ability": "4", "abilityId": str(random.randint(111, 999)),
+                                           "battleId": self.bId,
+                                           "aoeTargets": []}
+                                          ]
                         else:
-                            for x in self.fb['args'][0]['playerSet']:
-                                if (x['id'] == msg['args'][0]):
-                                    self.warning += 1
-                                    print("[--Warning--] " + str(msg['args'][0]) + " died.")
-                                    if (self.warning >= 2):
-                                        print("[--Warning--] Second derg died. Aborting.")
-                                        if self.debuglog:
-                                            with open(Coliseum.userid + '.log', 'a') as p:
-                                                p.write("----- {}".format("2 dragons dead.") + '\n')
-                                        self.warning = 0
-                                        self.loop.stop()
-                                        # self.loop.close()
-                elif (msg['name'] == 'winBattle'):
-
-                    ### Add data to file ###
-                    if self.fb:
-                        data = {}
-                        data['time'] = time.time()
-                        data['venue'] = self.fb['args'][0]['venue']
-                        data['enemies'] = []
-                        for i, g in enumerate(self.fb['args'][0]['enemySet']):
-                            data['enemies'].append({})
-                            data['enemies'][i]['realid'] = g['realid']
-                            data['enemies'][i]['name'] = g['name']
-                            data['enemies'][i]['element'] = g['element']
-                        data['loot'] = []
-                        for i, h in enumerate(msg['args'][0]['loot']):
-                            data['loot'].append({})
-                            data['loot'][i]['id'] = h['id']
-                            data['loot'][i]['name'] = h['name']
-                            data['loot'][i]['value'] = h['value']
-                            data['loot'][i]['rarity'] = h['rarity']
-                            data['loot'][i]['subtype'] = h['subtype']
-                        with open(Coliseum.userid + '.txt', 'a') as f:
-                            json.dump(data, f, separators=(',', ':'))
-                            f.write('\n')
-                    ### End adding data to file ###
-
-                    if self.train:
-                        print("[Level]", str(self.fb['args'][0]['playerSet'][self.trainpos]['level']),
-                              " [Exp]", str(self.fb['args'][0]['playerSet'][self.trainpos]['xp_now']))
-                    self.derg = None
-                    self.enemyList = []
-                    self.fb = None
-                    self.fa = None
-                    self.warning = 0
-                    for e in msg['args'][0]['loot']:
-                        print('[' + e['subtype'] + '] [' + e['name'].replace('\u2019', "'") + ']')
-                    print('-----                    [' + str(datetime.datetime.now().time())[:-3] + ']')
-                    go = {"name": "coliseum_beginBattle", "args": [{"venue": self.area}]}
+                            go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                           "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
+                                           "ability": "1", "abilityId": str(random.randint(111, 999)),
+                                           "battleId": self.bId,
+                                           "aoeTargets": []}
+                                          ]
                     goforth = "5:::" + json.dumps(go, separators=(',', ':'))
                     self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), self.sendMessage, goforth.encode('utf-8'))
                     if self.debuglog:
                         # self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), print, "-> {}".format(goforth))
                         with open(Coliseum.userid + '.log', 'a') as p:
                             p.write("-> {}".format(goforth) + '\n')
-        except KeyboardInterrupt:
-            if self.debuglog:
-                with open(Coliseum.userid + '.log', 'a') as p:
-                    p.write("----- {}".format("KeyboardInterrupt") + '\n')
-            sys.exit()
+            elif (msg['name'] == 'finalizeAbility'):
+                self.fa = msg
+                if not self.fa['args'][0]['newTurns'] == 0:
+                    if not re.search('^e\d+x+', str(self.fa['args'][0]['newTurns']['array'][0]['id'])):
+                        if self.enemyList:
+                            # for d in self.fa['args'][0]['newTurns']['array']:
+                            #     if ((float(d['health']) < float((d['maxHP'])*0.25)) and d['team'] == 1):
+                            #         self.loop.stop()
+                            #         self.loop.close()
+                            #         sys.exit()
+                            for i, x in enumerate(self.fb['args'][0]['enemySet']):
+                                if x['id'] == self.fa['args'][0]['target']:
+                                    self.fb['args'][0]['enemySet'][i]['health'] -= self.fa['args'][0]['damage']
+                                    # print(str(self.fb['args'][0]['enemySet'][i]['id']) + ' ' + str(self.fb['args'][0]['enemySet'][i]['health']))
+                            self.derg = self.fa['args'][0]['newTurns']['array'][0]
+                            go = {"name": "coliseum_useAbility"}
+                            if self.derg['breath'] < 35:
+                                go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                               "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
+                                               "ability": "1", "abilityId": str(random.randint(111, 999)),
+                                               "battleId": self.bId,
+                                               "aoeTargets": []}
+                                              ]
+                            if self.derg['breath'] >= 35:
+                                if (self.getScratch(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']):
+                                    go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                                   "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
+                                                   "ability": "1", "abilityId": str(random.randint(111, 999)),
+                                                   "battleId": self.bId,
+                                                   "aoeTargets": []}
+                                                  ]
+                                elif (self.getEliminate(self.derg, self.enemyList[0]) >= self.enemyList[0]['health']):
+                                    go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                                   "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
+                                                   "ability": "4", "abilityId": str(random.randint(111, 999)),
+                                                   "battleId": self.bId,
+                                                   "aoeTargets": []}
+                                                  ]
+                                else:
+                                    go["args"] = [{"caster": {"id": self.derg['id'], "ai": "0"},
+                                                   "target": {"id": self.enemyList[0]['id'], "ai": self.enemyList[0]['ai']},
+                                                   "ability": "1", "abilityId": str(random.randint(111, 999)),
+                                                   "battleId": self.bId,
+                                                   "aoeTargets": []}
+                                                  ]
+                            goforth = "5:::" + json.dumps(go, separators=(',', ':'))
+                            self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), self.sendMessage, goforth.encode('utf-8'))
+                            if self.debuglog:
+                                # self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), print, "-> {}".format(goforth))
+                                with open(Coliseum.userid + '.log', 'a') as p:
+                                    p.write("-> {}".format(goforth) + '\n')
+            elif (msg['name'] == "death"):
+                if self.enemyList:
+                    if (self.enemyList[0]['id'] == msg['args'][0]):
+                        self.enemyList.pop(0)
+                    else:
+                        for x in self.fb['args'][0]['playerSet']:
+                            if (x['id'] == msg['args'][0]):
+                                self.warning += 1
+                                print("[--Warning--] " + str(msg['args'][0]) + " died.")
+                                if (self.warning >= 2):
+                                    print("[--Warning--] Second derg died. Aborting.")
+                                    if self.debuglog:
+                                        with open(Coliseum.userid + '.log', 'a') as p:
+                                            p.write("----- {}".format("2 dragons dead.") + '\n')
+                                    self.warning = 0
+                                    self.loop.stop()
+                                    # self.loop.close()
+            elif (msg['name'] == 'winBattle'):
+
+                ### Add data to file ###
+                if self.fb:
+                    data = {}
+                    data['time'] = time.time()
+                    data['venue'] = self.fb['args'][0]['venue']
+                    data['enemies'] = []
+                    for i, g in enumerate(self.fb['args'][0]['enemySet']):
+                        data['enemies'].append({})
+                        data['enemies'][i]['realid'] = g['realid']
+                        data['enemies'][i]['name'] = g['name']
+                        data['enemies'][i]['element'] = g['element']
+                    data['loot'] = []
+                    for i, h in enumerate(msg['args'][0]['loot']):
+                        data['loot'].append({})
+                        data['loot'][i]['id'] = h['id']
+                        data['loot'][i]['name'] = h['name']
+                        data['loot'][i]['value'] = h['value']
+                        data['loot'][i]['rarity'] = h['rarity']
+                        data['loot'][i]['subtype'] = h['subtype']
+                    with open(Coliseum.userid + '.txt', 'a') as f:
+                        json.dump(data, f, separators=(',', ':'))
+                        f.write('\n')
+                ### End adding data to file ###
+
+                if self.train:
+                    print("[Level]", str(self.fb['args'][0]['playerSet'][self.trainpos]['level']),
+                          " [Exp]", str(self.fb['args'][0]['playerSet'][self.trainpos]['xp_now']))
+                self.derg = None
+                self.enemyList = []
+                self.fb = None
+                self.fa = None
+                self.warning = 0
+                for e in msg['args'][0]['loot']:
+                    print('[' + e['subtype'] + '] [' + e['name'].replace('\u2019', "'") + ']')
+                print('-----                    [' + str(datetime.datetime.now().time())[:-3] + ']')
+                go = {"name": "coliseum_beginBattle", "args": [{"venue": self.area}]}
+                goforth = "5:::" + json.dumps(go, separators=(',', ':'))
+                self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), self.sendMessage, goforth.encode('utf-8'))
+                if self.debuglog:
+                    # self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), print, "-> {}".format(goforth))
+                    with open(Coliseum.userid + '.log', 'a') as p:
+                        p.write("-> {}".format(goforth) + '\n')
 
     def onClose(self, wasClean, code, reason):
         print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + "WebSocket connection closed: {0}".format(reason))
