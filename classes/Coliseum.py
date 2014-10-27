@@ -513,3 +513,21 @@ class Coliseum(WebSocketClientProtocol):
     def getEnfeeble(self, attacker, defender):
         elemult = Coliseum.getElementalMultiplier(attacker, defender)
         return (elemult * ((2 * attacker['intellect'] + 100) - math.floor(defender['mind'] / 3.) * 2 + math.round((defender['mind'] % 3) / 3.)))
+
+    def hasScratch(self, dragon):
+        if (dragon['a0'] == 495):
+            return True
+        else:
+            return False
+
+    def hasShred(self, dragon):
+        if (dragon['a1'] == 497) or (dragon['a2'] == 497) or (dragon['a3'] == 497) or (dragon['a4'] == 497):
+            return True
+        else:
+            return False
+
+    def hasEliminate(self, dragon):
+        if (dragon['a1'] == 498) or (dragon['a2'] == 498) or (dragon['a3'] == 498) or (dragon['a4'] == 498):
+            return True
+        else:
+            return False
