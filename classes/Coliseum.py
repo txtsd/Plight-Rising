@@ -330,11 +330,6 @@ class Coliseum(WebSocketClientProtocol):
                 if not self.fa['args'][0]['newTurns'] == 0:
                     if not re.search('^e\d+x+', str(self.fa['args'][0]['newTurns']['array'][0]['id'])):
                         if self.enemyList:
-                            # for d in self.fa['args'][0]['newTurns']['array']:
-                            #     if ((float(d['health']) < float((d['maxHP'])*0.25)) and d['team'] == 1):
-                            #         self.loop.stop()
-                            #         self.loop.close()
-                            #         sys.exit()
                             for i, x in enumerate(self.fb['args'][0]['enemySet']):
                                 if x['id'] == self.fa['args'][0]['target']:
                                     self.fb['args'][0]['enemySet'][i]['health'] -= self.fa['args'][0]['damage']
