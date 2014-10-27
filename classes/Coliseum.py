@@ -530,3 +530,9 @@ class Coliseum(WebSocketClientProtocol):
             return True
         else:
             return False
+
+    def getFullHPEnemy(self, enemyList):
+        for i, x in enumerate(enemyList):
+            if x['health'] == x['maxHP']:
+                return i
+        return False
