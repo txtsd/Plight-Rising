@@ -18,4 +18,4 @@
 * Runes of the Arcanist Autoplayer
 
 
-**Please visit the forum for installation and usage instructions.**
+**Please visit [the forum](http://clraik.com/forum/showthread.php?t=40283) for installation and usage instructions.**
