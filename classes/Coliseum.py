@@ -361,7 +361,7 @@ class Coliseum(WebSocketClientProtocol):
                                           ]
                     else:
                         print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + self.derg['dragonname'] + "does not have Scratch!")
-                        self.loop.close()
+                        self.loop.stop()
 
                     goforth = "5:::" + json.dumps(go, separators=(',', ':'))
                     self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), self.sendMessage, goforth.encode('utf-8'))
@@ -450,7 +450,7 @@ class Coliseum(WebSocketClientProtocol):
                                                       ]
                                 else:
                                     print('[' + str(datetime.datetime.now().time())[:-3] + '] ' + self.derg['dragonname'] + "does not have Scratch!")
-                                    self.loop.close()
+                                    self.loop.stop()
 
                                 goforth = "5:::" + json.dumps(go, separators=(',', ':'))
                                 self.loop.call_later(random.uniform(self.mindelay, self.maxdelay), self.sendMessage, goforth.encode('utf-8'))
