@@ -1,4 +1,4 @@
-![Plight Rising] (http://i.imgur.com/TiSX5NU.png)
+![Plight Rising](http://i.imgur.com/TiSX5NU.png)
 
 #### Features:
 * Gather
