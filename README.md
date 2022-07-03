@@ -5,7 +5,7 @@
 * Grab Pinkerton's item
 * Feed
 * Bond with ALL your familiars
-* Play the Coiseum for you
+* Play the Coliseum for you
 
 #### Planned Features:
 * Nest Incubator
