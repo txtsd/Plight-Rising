@@ -35,5 +35,4 @@ If sourcehut is not feasible, contribution is welcome from across mirrors.
 * Crim / Swipp / Tomo Autothings
 * Runes of the Arcanist Autoplayer
 
-
 **Please visit [the forum](http://clraik.com/forum/showthread.php?t=40283) for installation and usage instructions.**
