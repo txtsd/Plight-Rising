@@ -2,6 +2,8 @@
 
 ![Plight Rising](https://i.imgur.com/TiSX5NU.png)
 
+Plight Rising contains scripts that will let you automate certain dailies on Flight Rising, and automatically play the Coliseum.
+
 ## Links
 
 Project: <https://sr.ht/~txtsd/Plight-Rising/> <br>
